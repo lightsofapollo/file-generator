@@ -1,14 +1,18 @@
-var Generator = require('../lib/generator');
+var Generator = require('../lib/generator'),
+    Mkdir = require('../lib/command/mkdir'),
+    Inheritance = require('../lib/inheritance');
 
 describe("generator", function(){
 
   var subject,
       dest =  __dirname + '/out',
-      fsPath = require('path');
+      fsPath = require('path'),
+      tplPaths = [__dirname + '/tpl1/'];
 
   beforeEach(function(){
     subject = new Generator({
-      target: dest
+      target: dest,
+      templatePaths: tplPaths
     });
   });
 
@@ -25,11 +29,19 @@ describe("generator", function(){
       expect(subject.target).to.be(dest);
     });
 
+    it("should crate commandQueue", function(){
+      expect(subject.commandQueue).to.eql({});
+    });
+
+    it("should create .inheritance object", function(){
+      expect(subject.inheritance).to.be.a(Inheritance);
+    });
+
+    it("should set .inheritance paths based on templatePaths", function(){
+      expect(subject.inheritance.paths).to.eql(tplPaths);
+    });
 
   });
-
-  console.log(this.beforeEach);
-
 
   describe(".getAbsolutePath", function(){
 
@@ -37,6 +49,39 @@ describe("generator", function(){
 
     it("should return an absolute path to a relative segment", function(){
       expect(subject.getAbsolutePath('foo.js')).to.be(expected);
+    });
+
+  });
+
+  describe(".mkdir", function(){
+
+    var queue, result;
+
+    beforeEach(function(){
+      result = subject.mkdir('foo');
+
+      queue = subject.commandQueue.mkdir;
+    });
+
+    it("should create mkdir hash", function(){
+      expect(queue).to.be.a("object");
+    });
+
+    it("should add a mkdir command instance", function(){
+      //path normalization
+      expect(queue['foo/']).to.be.a(Mkdir);
+    });
+
+    it("should have set .path in command to foo/", function(){
+      expect(queue['foo/'].path).to.be('foo/');
+    });
+
+    it("should set .gen on command", function(){
+      expect(queue['foo/'].gen).to.be(subject);
+    });
+
+    it("should be chainable", function(){
+      expect(result).to.be(subject);
     });
 
   });

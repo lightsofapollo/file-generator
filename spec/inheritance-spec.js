@@ -1,7 +1,15 @@
+fsPath = require('path');
+
+
 describe("inheritance", function(){
 
   var subject,
-      Inheritance = require('../lib/Inheritance');
+      Inheritance = require('../lib/Inheritance'),
+      paths = [
+        __dirname + '/tpl1',
+        __dirname + '/tpl2',
+        __dirname + '/tpl3'
+      ];
 
   beforeEach(function(){
     subject = new Inheritance();
@@ -34,6 +42,35 @@ describe("inheritance", function(){
     it("should push path into .paths", function(){
       expect(subject.paths).to.contain('foo/');
     });
+
+  });
+
+  describe(".find", function(){
+
+    describe("finding a file", function(){
+      var result, err;
+
+      beforeEach(function(done){
+        subject.paths = paths;
+        subject.find('c.txt', function(error, found){
+          result = found;
+          err = error;
+          done();
+        });
+      });
+
+      it("should be under tpl3", function(){
+        expect(result).to.eql(
+          fsPath.join(__dirname, 'tpl3', 'c.txt')
+        );
+      });
+
+      it("should not have an error", function(){
+        expect(!!err).to.be(false);
+      });
+
+    });
+
 
   });
 
