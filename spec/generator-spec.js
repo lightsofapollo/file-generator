@@ -5,23 +5,13 @@ var Generator = require('../lib/generator'),
 describe("generator", function(){
 
   var subject,
-      dest =  __dirname + '/out',
+      dest = specHelper.factory.targetPath(),
       fsPath = require('path'),
-      tplPaths = [__dirname + '/tpl1/'];
+      tplPaths = specHelper.factory.templatePaths();
 
   beforeEach(function(){
-    subject = new Generator({
-      target: dest,
-      templatePaths: tplPaths
-    });
+    subject = specHelper.factory.generator();
   });
-
-  describe(".logger", function(){
-    it("should be console.log by default", function(){
-      expect(subject.logger).to.be(console.log);
-    });
-  });
-
 
   describe("initialization", function(){
 
@@ -43,12 +33,50 @@ describe("generator", function(){
 
   });
 
-  describe(".getAbsolutePath", function(){
+  describe(".targetPath", function(){
 
     var expected = fsPath.join(dest, 'foo.js');
 
     it("should return an absolute path to a relative segment", function(){
-      expect(subject.getAbsolutePath('foo.js')).to.be(expected);
+      expect(subject.targetPath('foo.js')).to.be(expected);
+    });
+
+  });
+
+  describe(".targetPathExists", function(){
+
+    var result;
+
+    beforeEach(function(){
+      sinon.spy(fsPath, 'existsSync');
+
+      result = subject.targetPathExists('foo/');
+    });
+
+    it("should check existance of path in target", function(){
+      expect(fsPath.existsSync).was.calledWith(
+        subject.targetPath('foo/')
+      );
+    });
+
+    it("should return false when path does not exist", function(){
+      expect(result).to.be(false);
+    });
+
+  });
+  describe(".templatePath", function(){
+
+    var cb = function(){};
+
+    beforeEach(function(){
+      sinon.stub(subject.inheritance, 'find');
+      subject.templatePath('foo/', cb);
+    });
+
+    it("should delegate to inheritance.find", function(){
+      expect(subject.inheritance.find).was.calledWith(
+        'foo/', cb
+      );
     });
 
   });

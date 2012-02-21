@@ -6,17 +6,14 @@ var Mkdir = require('../../lib/command/mkdir'),
 describe("command/mkdir", function(){
 
   var path = 'foo/',
-      dest = __dirname + '/../out/',
+      dest = specHelper.factory.targetPath(),
       subject,
       generator;
 
   specHelper.mockLogger.setup(this);
 
   beforeEach(function(){
-    generator = new Generator({
-      target: dest,
-      logger: specHelper.mockLogger
-    });
+    generator = specHelper.factory.generator();
     subject = new Mkdir(path, generator);
   });
 
@@ -39,22 +36,15 @@ describe("command/mkdir", function(){
 
   describe(".pathExists", function(){
 
-    var result;
-
     beforeEach(function(){
-      sinon.spy(fsPath, 'existsSync');
-
-      result = subject.pathExists();
+      sinon.spy(subject.gen, 'targetPathExists');
+      subject.pathExists();
     });
 
-    it("should check existance of path in target", function(){
-      expect(fsPath.existsSync).was.calledWith(
-        generator.getAbsolutePath(path)
+    it("should call gen.targetPathExists with .path", function(){
+      expect(subject.gen.targetPathExists).was.calledWith(
+        subject.path
       );
-    });
-
-    it("should return false when path does not exist", function(){
-      expect(result).to.be(false);
     });
 
   });

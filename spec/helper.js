@@ -9,6 +9,45 @@ specHelper = {
 };
 
 
+//factories / fixtures
+(function(helper){
+  var factory, Generator;
+
+  factory = {
+
+    _templatePaths: [
+      __dirname + '/tpl1',
+      __dirname + '/tpl2',
+      __dirname + '/tpl3'
+    ],
+
+    targetPath: function(){
+      return __dirname + '/out/';
+    },
+
+    templatePaths: function(){
+      return factory._templatePaths;
+    },
+
+    generator: function(){
+      //lazy load
+      if(!Generator){
+        Generator = require('../lib/generator');
+      }
+
+      return new Generator({
+        templatePaths: factory.templatePaths(),
+        target: factory.targetPath(),
+        logger: helper.mockLogger
+      });
+    }
+
+  };
+
+  helper.factory = factory;
+
+}(specHelper));
+
 //file system helpers
 
 (function(helper){
