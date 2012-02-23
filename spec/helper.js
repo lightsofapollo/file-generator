@@ -16,13 +16,13 @@ specHelper = {
   factory = {
 
     _templatePaths: [
-      __dirname + '/tpl1',
-      __dirname + '/tpl2',
-      __dirname + '/tpl3'
+      __dirname + '/files/tpl1',
+      __dirname + '/files/tpl2',
+      __dirname + '/files/tpl3'
     ],
 
     targetPath: function(){
-      return __dirname + '/out/';
+      return __dirname + '/files/out/';
     },
 
     templatePaths: function(){
@@ -55,6 +55,10 @@ specHelper = {
   var fs = require('fs'),
       fsPath = require('path');
 
+  function relativePath(path){
+    return fsPath.join(__dirname, 'files', path);
+  }
+
   function mkdir(){
 
     path = fsPath.join.apply(fsPath, arguments);
@@ -72,12 +76,18 @@ specHelper = {
   }
 
   function write(path, contents){
-    //path is relative to spec/out
-    path = fsPath.join(__dirname, 'out', path);
+
+    //So we use the original un-altered path
+    rm(path);
 
     beforeEach(function(){
-      fs.writeFileSync(path, contents);
+      fs.writeFileSync(relativePath(path), contents);
     });
+
+  }
+
+  function rm(path){
+    path = relativePath(path);
 
     afterEach(function(){
       if(fsPath.existsSync(path)){
@@ -86,9 +96,20 @@ specHelper = {
     });
   }
 
+  function read(path){
+    return fs.readFileSync(relativePath(path), 'utf8');
+  }
+
+  function copy(from, to){
+    write(to, read(from));
+  }
+
   helper.fs = {
     mkdir: mkdir,
-    write: write
+    write: write,
+    rm: rm,
+    read: read,
+    copy: copy
   };
 
 }(specHelper));
@@ -106,9 +127,9 @@ specHelper = {
     return messages;
   };
 
-  helper.mockLogger.setup = function(ctx){
+  helper.mockLogger.setup = function(){
 
-    ctx.beforeEach(function(){
+    beforeEach(function(){
       helper.mockLogger.clear();
     });
 

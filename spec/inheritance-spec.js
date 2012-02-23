@@ -6,9 +6,9 @@ describe("inheritance", function(){
   var subject,
       Inheritance = require('../lib/Inheritance'),
       paths = [
-        __dirname + '/tpl1',
-        __dirname + '/tpl2',
-        __dirname + '/tpl3'
+        __dirname + '/files/tpl1',
+        __dirname + '/files/tpl2',
+        __dirname + '/files/tpl3'
       ];
 
   beforeEach(function(){
@@ -61,7 +61,7 @@ describe("inheritance", function(){
 
       it("should be under tpl3", function(){
         expect(result).to.eql(
-          fsPath.join(__dirname, 'tpl3', 'c.txt')
+          fsPath.join(__dirname, 'files', 'tpl3', 'c.txt')
         );
       });
 

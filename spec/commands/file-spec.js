@@ -49,16 +49,11 @@ describe("command/file-abstract", function(){
 
     var contents = 'foo';
 
-    specHelper.fs.write('index.js', contents);
+    specHelper.fs.write('out/index.js', contents);
+    specHelper.fs.rm('out/index.js.bak');
 
     beforeEach(function(done){
       subject._moveTarget(done);
-    });
-
-    afterEach(function(){
-      if(fsPath.existsSync(subject.targetBackupPath())){
-        fs.unlinkSync(subject.targetBackupPath());
-      }
     });
 
     it("should create targetBackupPath", function(){
@@ -107,7 +102,7 @@ describe("command/file-abstract", function(){
   });
 
   describe(".getContents", function(){
-    var expected = fs.readFileSync(dest + '/../tpl1/index.js', 'utf8'),
+    var expected = specHelper.fs.read('tpl1/index.js'),
         actual;
 
     beforeEach(function(done){
@@ -143,20 +138,15 @@ describe("command/file-abstract", function(){
   });
 
   describe("._loadTarget", function(){
-    var targetPath = dest + '/index.js',
-        actual, expected = 'foo';
+    var actual, expected = 'foo';
+
+    specHelper.fs.write('out/index.js', expected);
 
     beforeEach(function(done){
-      fs.writeFileSync(targetPath, expected, 'utf8');
-
       subject._loadTarget(function(err, contents){
         actual = contents;
         done(err);
       });
-    });
-
-    afterEach(function(){
-      fs.unlinkSync(targetPath);
     });
 
     it("should load contents of target file", function(){
@@ -207,17 +197,9 @@ describe("command/file-abstract", function(){
   });
 
   describe("._checkTargetSame", function(){
-    var targetPath = dest + '/index.js';
 
     describe("when they don't match", function(){
-
-      beforeEach(function(){
-        fs.writeFileSync(targetPath, 'foo', 'utf8');
-      });
-
-      afterEach(function(){
-        fs.unlinkSync(targetPath);
-      });
+      specHelper.fs.write('out/index.js', 'foo');
 
       it("should have the result as false (not same)", function(done){
         subject._checkTargetSame(function(err, result){
@@ -230,19 +212,11 @@ describe("command/file-abstract", function(){
 
     describe("when they are the same", function(){
 
-      var result,
+      var targetPath = dest + '/index.js',
+          result,
           path;
 
-      beforeEach(function(done){
-        subject.output(function(err, contents){
-          fs.writeFileSync(targetPath, contents, 'utf8');
-          done(err);
-        });
-      });
-
-      afterEach(function(){
-        fs.unlinkSync(targetPath);
-      });
+      specHelper.fs.copy('tpl1/index.js', 'out/index.js');
 
       it("should have the result as true (same)", function(done){
         subject._checkTargetSame(function(err, result){
@@ -295,21 +269,10 @@ describe("command/file-abstract", function(){
 
     describe("when the file exists and is the same", function(){
 
-      var contents = fs.readFileSync(dest + '/../tpl1/index.js', 'utf8');
+      specHelper.fs.copy('tpl1/index.js', 'out/index.js');
 
       beforeEach(function(){
         sinon.spy(subject, '_checkTargetSame');
-      });
-
-      beforeEach(function(done){
-        subject.output(function(err, contents){
-          fs.writeFileSync(subject.targetPath(), contents, 'utf8');
-          done(err);
-        });
-      });
-
-      afterEach(function(){
-        fs.unlinkSync(subject.targetPath());
       });
 
       runCheck();
@@ -325,7 +288,7 @@ describe("command/file-abstract", function(){
     });
 
     describe("when file exists and is not the same", function(){
-      specHelper.fs.write('index.js', 'foo');
+      specHelper.fs.write('out/index.js', 'foo');
 
       beforeEach(function(){
         sinon.spy(subject, '_moveTarget');
@@ -345,14 +308,10 @@ describe("command/file-abstract", function(){
       });
 
       describe("when user accepts prompt", function(){
+        specHelper.fs.rm('out/index.js.bak');
+
         beforeEach(function(){
           stubPrompt(true);
-        });
-
-        afterEach(function(){
-          if(fsPath.existsSync(subject.targetBackupPath())){
-            fs.unlinkSync(subject.targetBackupPath());
-          }
         });
 
         runCheck();
@@ -367,6 +326,12 @@ describe("command/file-abstract", function(){
 
       });
 
+    });
+
+    describe(".exectue", function(){
+
+      specHelper.fs.rm('out/index.js');
+      
     });
 
   });
