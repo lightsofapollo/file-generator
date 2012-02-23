@@ -1,5 +1,5 @@
 var Generator = require('../lib/generator'),
-    Mkdir = require('../lib/command/mkdir'),
+    Mkdir = require('../lib/commands/mkdir'),
     Inheritance = require('../lib/inheritance');
 
 describe("generator", function(){

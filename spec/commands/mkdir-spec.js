@@ -1,4 +1,4 @@
-var Mkdir = require('../../lib/command/mkdir'),
+var Mkdir = require('../../lib/commands/mkdir'),
     Generator = require('../../lib/generator'),
     fsPath = require('path'),
     fs = require('fs');

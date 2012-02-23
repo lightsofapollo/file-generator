@@ -71,8 +71,24 @@ specHelper = {
 
   }
 
+  function write(path, contents){
+    //path is relative to spec/out
+    path = fsPath.join(__dirname, 'out', path);
+
+    beforeEach(function(){
+      fs.writeFileSync(path, contents);
+    });
+
+    afterEach(function(){
+      if(fsPath.existsSync(path)){
+        fs.unlinkSync(path);
+      }
+    });
+  }
+
   helper.fs = {
-    mkdir: mkdir
+    mkdir: mkdir,
+    write: write
   };
 
 }(specHelper));

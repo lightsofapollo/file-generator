@@ -1,6 +1,8 @@
 var Generator = require('../../lib/generator'),
-    FileAbstract = require('../../lib/command/file-abstract'),
-    fs = require('fs');
+    File = require('../../lib/commands/file'),
+    fs = require('fs'),
+    fsPath = require('path'),
+    commander = require('commander');
 
 describe("command/file-abstract", function(){
 
@@ -13,7 +15,7 @@ describe("command/file-abstract", function(){
 
   beforeEach(function(){
     generator = specHelper.factory.generator();
-    subject = new FileAbstract(path, generator);
+    subject = new File(path, generator);
   });
 
   function lastLog(){
@@ -34,11 +36,47 @@ describe("command/file-abstract", function(){
   });
 
 
+  describe("._moveTarget", function(){
+
+    var contents = 'foo';
+
+    specHelper.fs.write('index.js', contents);
+
+    beforeEach(function(done){
+      subject._moveTarget(done);
+    });
+
+    afterEach(function(){
+      if(fsPath.existsSync(subject.targetBackupPath())){
+        fs.unlinkSync(subject.targetBackupPath());
+      }
+    });
+
+    it("should create targetBackupPath", function(){
+      expect(fsPath.existsSync(subject.targetBackupPath()));
+    });
+
+    it("should copy file contents to backup", function(){
+      expect(fs.readFileSync(subject.targetBackupPath(), 'utf8')).to.be(contents);
+    });
+
+  });
+
   describe(".targetPath", function(){
 
     it("should should target (save to) path", function(){
       expect(subject.targetPath()).to.be(
         subject.gen.targetPath(subject.path)
+      );
+    });
+
+  });
+
+  describe(".targetBackupPath", function(){
+
+    it("should equal targetPath + .bak", function(){
+      expect(subject.targetBackupPath()).to.be(
+        subject.targetPath() + subject.BACKUP_SUFFIX
       );
     });
 
@@ -114,6 +152,58 @@ describe("command/file-abstract", function(){
 
     it("should load contents of target file", function(){
       expect(actual).to.be(expected);
+    });
+
+  });
+
+  describe("._promptForDelete", function(){
+
+    var asking;
+
+    function stubPrompt(result){
+      sinon.stub(commander, 'prompt', function(ask, callback){
+        asking = ask;
+        process.nextTick(function(){
+          callback(result);
+        });
+      });
+    }
+
+    beforeEach(function(){
+      sinon.stub(subject, '_moveTarget', function(callback){
+        process.nextTick(callback);
+      });
+    });
+
+    describe("when prompt is true", function(){
+
+      beforeEach(function(done){
+        stubPrompt(true);
+        subject._promptForDelete(done);
+      });
+
+      it("should ask user if they want to delete path", function(){
+        expect(asking).to.contain('Overwrite');
+        expect(asking).to.contain(subject.path);
+      });
+
+      it("should have called _moveTarget", function(){
+        expect(subject._moveTarget).was.called();
+      });
+
+    });
+
+    describe("when prompt is false", function(){
+
+      beforeEach(function(done){
+        stubPrompt(false);
+        subject._promptForDelete(done);
+      });
+
+      it("should not have called _moveTarget", function(){
+        expect(subject._moveTarget).was.notCalled();
+      });
+
     });
 
   });
