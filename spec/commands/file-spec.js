@@ -23,6 +23,15 @@ describe("command/file-abstract", function(){
     return logs[logs.length - 1];
   }
 
+  function stubPrompt(result){
+    sinon.stub(commander, 'prompt', function(ask, callback){
+      stubPrompt.asking = ask;
+      process.nextTick(function(){
+        callback(result);
+      });
+    });
+  }
+
   describe("initialize", function(){
 
     it("should save first argument as .path", function(){
@@ -158,17 +167,6 @@ describe("command/file-abstract", function(){
 
   describe("._promptForDelete", function(){
 
-    var asking;
-
-    function stubPrompt(result){
-      sinon.stub(commander, 'prompt', function(ask, callback){
-        asking = ask;
-        process.nextTick(function(){
-          callback(result);
-        });
-      });
-    }
-
     beforeEach(function(){
       sinon.stub(subject, '_moveTarget', function(callback){
         process.nextTick(callback);
@@ -183,8 +181,8 @@ describe("command/file-abstract", function(){
       });
 
       it("should ask user if they want to delete path", function(){
-        expect(asking).to.contain('Overwrite');
-        expect(asking).to.contain(subject.path);
+        expect(stubPrompt.asking).to.contain('Overwrite');
+        expect(stubPrompt.asking).to.contain(subject.path);
       });
 
       it("should have called _moveTarget", function(){
@@ -270,6 +268,107 @@ describe("command/file-abstract", function(){
     it("should delegate call to getContents", function(){
       expect(subject.getContents).was.calledWith(cb);
     });
+  });
+
+  describe(".check", function(){
+
+    var result;
+
+    function runCheck(){
+      beforeEach(function(done){
+        subject.check(function(err, status){
+          result = status;
+          done();
+        });
+      });
+    }
+
+    describe("when path does not exist", function(){
+
+      runCheck();
+
+      it("should return true", function(){
+        expect(result).to.be(true);
+      });
+
+    });
+
+    describe("when the file exists and is the same", function(){
+
+      var contents = fs.readFileSync(dest + '/../tpl1/index.js', 'utf8');
+
+      beforeEach(function(){
+        sinon.spy(subject, '_checkTargetSame');
+      });
+
+      beforeEach(function(done){
+        subject.output(function(err, contents){
+          fs.writeFileSync(subject.targetPath(), contents, 'utf8');
+          done(err);
+        });
+      });
+
+      afterEach(function(){
+        fs.unlinkSync(subject.targetPath());
+      });
+
+      runCheck();
+
+      it("should call _checkTargetSame", function(){
+        expect(subject._checkTargetSame).was.called();
+      });
+
+      it("should return true", function(){
+        expect(result).to.be(true);
+      });
+
+    });
+
+    describe("when file exists and is not the same", function(){
+      specHelper.fs.write('index.js', 'foo');
+
+      beforeEach(function(){
+        sinon.spy(subject, '_moveTarget');
+      });
+
+      describe("when user declines prompt", function(){
+        beforeEach(function(){
+          stubPrompt(false);
+        });
+
+        runCheck();
+
+        it("should return false", function(){
+          expect(result).to.be(false);
+        });
+
+      });
+
+      describe("when user accepts prompt", function(){
+        beforeEach(function(){
+          stubPrompt(true);
+        });
+
+        afterEach(function(){
+          if(fsPath.existsSync(subject.targetBackupPath())){
+            fs.unlinkSync(subject.targetBackupPath());
+          }
+        });
+
+        runCheck();
+
+        it("should return true", function(){
+          expect(result).to.be(true);
+        });
+
+        it("should move target", function(){
+          expect(subject._moveTarget).was.called();
+        });
+
+      });
+
+    });
+
   });
 
 });
