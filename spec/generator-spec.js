@@ -3,6 +3,7 @@ var Generator = require('../lib/generator'),
     File = require('../lib/commands/file'),
     Template = require('../lib/commands/template'),
     Inheritance = require('../lib/inheritance'),
+    CommandQueue = require('../lib/command-queue'),
     Variables = require('../lib/variables');
 
 describe("generator", function(){
@@ -22,8 +23,16 @@ describe("generator", function(){
       expect(subject.target).to.be(dest);
     });
 
-    it("should crate commandQueue", function(){
-      expect(subject.commandQueue).to.eql({});
+    it("should create .queue", function(){
+      expect(subject.queue).to.be.a('object');
+    });
+
+    it("should create .queue.files which is a commandQueue instance", function(){
+      expect(subject.queue.files).to.be.a(CommandQueue);
+    });
+
+    it("should create .queue.directories which is a commandQueue instance", function(){
+      expect(subject.queue.directories).to.be.a(CommandQueue);
     });
 
     it("should create .inheritance object", function(){
@@ -105,11 +114,7 @@ describe("generator", function(){
 
       beforeEach(function(){
         result = subject[command](path);
-        queue = subject.commandQueue[queueName];
-      });
-
-      it("should create " + queueName + " queue object", function(){
-        expect(queue).to.be.a("object");
+        queue = subject.queue[queueName].commands;
       });
 
       it("should add a " + command + " command instance", function(){
@@ -198,6 +203,25 @@ describe("generator", function(){
 
         expect(msg).to.be(expected);
       });
+    });
+
+  });
+
+  describe(".run", function(){
+
+    beforeEach(function(done){
+      sinon.spy(subject.queue.files, 'run');
+      sinon.spy(subject.queue.directories, 'run');
+
+      subject.run(done);
+    });
+
+    it("should run directories queue", function(){
+      expect(subject.queue.directories.run).was.called();
+    });
+
+    it("should run files queue", function(){
+      expect(subject.queue.files.run).was.called();
     });
 
   });
