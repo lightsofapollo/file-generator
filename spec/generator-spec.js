@@ -1,5 +1,6 @@
 var Generator = require('../lib/generator'),
     Mkdir = require('../lib/commands/mkdir'),
+    File = require('../lib/commands/file'),
     Inheritance = require('../lib/inheritance'),
     Variables = require('../lib/variables');
 
@@ -96,7 +97,7 @@ describe("generator", function(){
       queue = subject.commandQueue.mkdir;
     });
 
-    it("should create mkdir hash", function(){
+    it("should create mkdir object", function(){
       expect(queue).to.be.a("object");
     });
 
@@ -119,6 +120,34 @@ describe("generator", function(){
 
   });
 
+  describe(".file", function(){
+
+    var queue, result;
+
+    beforeEach(function(){
+      result = subject.file('index.js');
+
+      queue = subject.commandQueue.files;
+    });
+
+    it("should create files object", function(){
+      expect(queue).to.be.a("object");
+    });
+
+    it("should add a file command instance", function(){
+      //path normalization
+      expect(queue['index.js']).to.be.a(File);
+    });
+
+    it("should set .gen on command", function(){
+      expect(queue['index.js'].gen).to.be(subject);
+    });
+
+    it("should be chainable", function(){
+      expect(result).to.be(subject);
+    });
+
+  });
   describe(".log", function(){
 
     var msg;
