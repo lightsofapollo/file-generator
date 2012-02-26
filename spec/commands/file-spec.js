@@ -329,9 +329,25 @@ describe("command/file-abstract", function(){
     });
 
     describe(".exectue", function(){
-
       specHelper.fs.rm('out/index.js');
-      
+
+      beforeEach(function(done){
+        subject.exectue(done);
+      });
+
+      it("should save file to out/index", function(){
+        expect(subject.pathExists()).to.be(true);
+      });
+
+      it("should have the same contents as the result of .output", function(done){
+        var actual = fs.readFileSync(subject.targetPath(), 'utf8');
+
+        subject.output(function(err, out){
+          expect(actual).to.be(out);
+          done();
+        });
+      });
+
     });
 
   });
