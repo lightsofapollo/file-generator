@@ -1,1 +1,2 @@
-function {{functionName}}{ {{contents}} }
+function foo(){
+}

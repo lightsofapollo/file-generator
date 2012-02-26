@@ -16,12 +16,36 @@ describe("variables", function(){
 
   describe(".set", function(){
 
-    beforeEach(function(){
-      subject.set('foo', 'one');
+    describe("when given a key and value", function(){
+
+      beforeEach(function(){
+        subject.set('foo', 'one');
+      });
+
+      it("should set foo key with value 'one' in ._vars", function(){
+        expect(subject._vars.foo).to.be('one');
+      });
+
     });
 
-    it("should set foo key with value 'one' in ._vars", function(){
-      expect(subject._vars.foo).to.be('one');
+    describe("when given an object", function(){
+
+      beforeEach(function(){
+        subject.set('baz', 'three');
+        subject.set({
+          foo: 'one',
+          bar: 'two'
+        });
+      });
+
+      it("should update _vars with object's key/value pairs but not override it", function(){
+        expect(subject._vars).to.eql({
+          foo: 'one',
+          bar: 'two',
+          baz: 'three'
+        });
+      });
+
     });
 
   });

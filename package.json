@@ -8,20 +8,21 @@
     "type": "git",
     "url": "https://github.com/lightsofapollo/node-file-generator.git"
   },
+
   "keywords": [
     "bootstrap",
     "file",
     "templating",
     "generator"
   ],
+
   "dependencies" : {
-    "step-object": "~0.2",
     "step": "~0.0",
-    "async": "~0.1",
     "mkdirp": "~0.3",
-    "handlebars": "~1.0",
-    "commander": "~0.5"
+    "commander": "~0.5",
+    "ejs": "~0.6"
   },
+
   "devDependencies": {
     "mocha"    :  "0.12.1",
     "expect.js"    :  "*",
@@ -30,6 +31,7 @@
     "sinon-mocha": "0.0.2",
     "sinon-expect": "*"
   },
+
   "license": "MIT",
   "engine": {
     "node": ">=0.4"
