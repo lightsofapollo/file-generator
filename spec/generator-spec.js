@@ -94,10 +94,10 @@ describe("generator", function(){
     beforeEach(function(){
       result = subject.mkdir('foo');
 
-      queue = subject.commandQueue.mkdir;
+      queue = subject.commandQueue.directories;
     });
 
-    it("should create mkdir object", function(){
+    it("should create directories object", function(){
       expect(queue).to.be.a("object");
     });
 
