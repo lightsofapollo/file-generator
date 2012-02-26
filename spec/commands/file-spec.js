@@ -24,7 +24,7 @@ describe("command/file-abstract", function(){
   }
 
   function stubPrompt(result){
-    sinon.stub(commander, 'prompt', function(ask, callback){
+    sinon.stub(commander, 'confirm', function(ask, callback){
       stubPrompt.asking = ask;
       process.nextTick(function(){
         callback(result);
@@ -158,6 +158,7 @@ describe("command/file-abstract", function(){
   describe("._promptForDelete", function(){
 
     beforeEach(function(){
+      sinon.stub(process.stdin, 'destroy');
       sinon.stub(subject, '_moveTarget', function(callback){
         process.nextTick(callback);
       });
@@ -179,6 +180,10 @@ describe("command/file-abstract", function(){
         expect(subject._moveTarget).was.called();
       });
 
+      it("should destroy stdin", function(){
+        expect(process.stdin.destroy).was.called();
+      });
+
     });
 
     describe("when prompt is false", function(){
@@ -190,6 +195,10 @@ describe("command/file-abstract", function(){
 
       it("should not have called _moveTarget", function(){
         expect(subject._moveTarget).was.notCalled();
+      });
+
+      it("should destroy stdin", function(){
+        expect(process.stdin.destroy).was.called();
       });
 
     });
@@ -281,8 +290,8 @@ describe("command/file-abstract", function(){
         expect(subject._checkTargetSame).was.called();
       });
 
-      it("should return true", function(){
-        expect(result).to.be(true);
+      it("should return false", function(){
+        expect(result).to.be(false);
       });
 
     });
