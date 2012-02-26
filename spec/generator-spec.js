@@ -1,6 +1,7 @@
 var Generator = require('../lib/generator'),
     Mkdir = require('../lib/commands/mkdir'),
-    Inheritance = require('../lib/inheritance');
+    Inheritance = require('../lib/inheritance'),
+    Variables = require('../lib/variables');
 
 describe("generator", function(){
 
@@ -25,6 +26,10 @@ describe("generator", function(){
 
     it("should create .inheritance object", function(){
       expect(subject.inheritance).to.be.a(Inheritance);
+    });
+
+    it("should create a .variables object", function(){
+      expect(subject.variables).to.be.a(Variables);
     });
 
     it("should set .inheritance paths based on templatePaths", function(){
