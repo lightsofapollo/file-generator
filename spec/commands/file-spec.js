@@ -328,11 +328,11 @@ describe("command/file-abstract", function(){
 
     });
 
-    describe(".exectue", function(){
+    describe(".execute", function(){
       specHelper.fs.rm('out/index.js');
 
       beforeEach(function(done){
-        subject.exectue(done);
+        subject.execute(done);
       });
 
       it("should save file to out/index", function(){
