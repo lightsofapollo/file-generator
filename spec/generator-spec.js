@@ -1,6 +1,7 @@
 var Generator = require('../lib/generator'),
     Mkdir = require('../lib/commands/mkdir'),
     File = require('../lib/commands/file'),
+    Template = require('../lib/commands/template'),
     Inheritance = require('../lib/inheritance'),
     Variables = require('../lib/variables');
 
@@ -87,67 +88,73 @@ describe("generator", function(){
 
   });
 
-  describe(".mkdir", function(){
+  describe("commands", function(){
 
+    // available for customization of command specs
     var queue, result;
 
-    beforeEach(function(){
-      result = subject.mkdir('foo');
+    /**
+     * Generates basics for a command spec.
+     *
+     * @param {String} path path passed to the command
+     * @param {String} command command name like 'file'
+     * @param {Object} classObject the class of the command
+     * @param {String} queueName name of the queue command is in
+     */
+    function shouldBeACommand(path, command, classObject, queueName){
 
-      queue = subject.commandQueue.directories;
+      beforeEach(function(){
+        result = subject[command](path);
+        queue = subject.commandQueue[queueName];
+      });
+
+      it("should create " + queueName + " queue object", function(){
+        expect(queue).to.be.a("object");
+      });
+
+      it("should add a " + command + " command instance", function(){
+        //path normalization
+        expect(queue[path]).to.be.a(classObject);
+      });
+
+      it("should have set .path in command to " + path, function(){
+        expect(queue[path].path).to.be(path);
+      });
+
+      it("should set .gen on command", function(){
+        expect(queue[path].gen).to.be(subject);
+      });
+
+      it("should be chainable", function(){
+        expect(result).to.be(subject);
+      });
+    }
+
+    describe(".mkdir", function(){
+      shouldBeACommand('foo/', 'mkdir', Mkdir, 'directories');
+
+      describe("with path normalization", function(){
+        beforeEach(function(){
+          subject.mkdir('foo');
+        });
+
+        it("should have set .path in command to foo/", function(){
+          expect(queue['foo/'].path).to.be('foo/');
+        });
+
+      });
     });
 
-    it("should create directories object", function(){
-      expect(queue).to.be.a("object");
+    describe(".file", function(){
+      shouldBeACommand('index.js', 'file', File, 'files');
     });
 
-    it("should add a mkdir command instance", function(){
-      //path normalization
-      expect(queue['foo/']).to.be.a(Mkdir);
-    });
-
-    it("should have set .path in command to foo/", function(){
-      expect(queue['foo/'].path).to.be('foo/');
-    });
-
-    it("should set .gen on command", function(){
-      expect(queue['foo/'].gen).to.be(subject);
-    });
-
-    it("should be chainable", function(){
-      expect(result).to.be(subject);
+    describe(".template", function(){
+      shouldBeACommand('index.js', 'template', Template, 'files');
     });
 
   });
 
-  describe(".file", function(){
-
-    var queue, result;
-
-    beforeEach(function(){
-      result = subject.file('index.js');
-
-      queue = subject.commandQueue.files;
-    });
-
-    it("should create files object", function(){
-      expect(queue).to.be.a("object");
-    });
-
-    it("should add a file command instance", function(){
-      //path normalization
-      expect(queue['index.js']).to.be.a(File);
-    });
-
-    it("should set .gen on command", function(){
-      expect(queue['index.js'].gen).to.be(subject);
-    });
-
-    it("should be chainable", function(){
-      expect(result).to.be(subject);
-    });
-
-  });
   describe(".log", function(){
 
     var msg;
