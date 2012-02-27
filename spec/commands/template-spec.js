@@ -27,6 +27,21 @@ describe("commands/template", function(){
     it("should setup .path", function(){
       expect(subject.path).to.be(path);
     });
+
+  });
+
+  describe(".getVariable", function(){
+    var getVariable;
+
+    beforeEach(function(){
+      getVariable = subject.getVariable;
+      generator.variables.set('foo.bar', 'value');
+    });
+
+    it("should be bound to the context of variables", function(){
+      expect(getVariable('foo.bar')).to.be('value');
+    });
+
   });
 
   describe(".variables", function(){
@@ -34,17 +49,7 @@ describe("commands/template", function(){
     var result;
 
     beforeEach(function(){
-      generator.variables.set({
-        firstName: 'One',
-        lastName: 'Two'
-      });
-
       result = subject.variables();
-    });
-
-    it("should include existing variables", function(){
-      expect(result.firstName).to.eql('One');
-      expect(result.lastName).to.eql('Two');
     });
 
     it("should set __dirname", function(){
@@ -59,6 +64,14 @@ describe("commands/template", function(){
       );
     });
 
+    it("should set variable", function(){
+      expect(result.variable).to.be(subject.getVariable);
+    });
+
+    it("should set get", function(){
+      expect(result.get).to.be(subject.getVariable);
+    });
+
   });
 
   describe(".output", function(){
@@ -66,8 +79,8 @@ describe("commands/template", function(){
     var expected = 'one two',
         actual,
         template = [
-          '<%= localOne %>',
-          '<%= localTwo %>'
+          "<%= get('local.one') %>",
+          "<%= get('local.two') %>"
         ].join(' ');
 
     beforeEach(function(){
@@ -82,8 +95,8 @@ describe("commands/template", function(){
     beforeEach(function(done){
 
       generator.variables.set({
-        localOne: 'one',
-        localTwo: 'two'
+        'local.one': 'one',
+        'local.two': 'two'
       });
 
       subject.output(function(err, contents){

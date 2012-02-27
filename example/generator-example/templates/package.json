@@ -1,4 +1,4 @@
 {
-  "name": "<%= package.name %>",
-  "version": "<%= package.version %>"
+  "name": "<%= get('package.name') %>",
+  "version": "<%= get('package.version') %>"
 }
