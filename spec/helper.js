@@ -127,16 +127,16 @@ specHelper = {
     return messages;
   };
 
-  helper.mockLogger.setup = function(){
-
-    beforeEach(function(){
-      helper.mockLogger.clear();
-    });
-
+  helper.mockLogger.last = function(){
+    return messages[messages.length - 1];
   };
-
+  
   helper.mockLogger.clear = function(){
     messages.length = 0;
   };
+  
+  beforeEach(function(){
+    helper.mockLogger.clear();
+  });
 
 }(specHelper));

@@ -11,17 +11,10 @@ describe("command/file-abstract", function(){
       subject,
       generator;
 
-  specHelper.mockLogger.setup(this);
-
   beforeEach(function(){
     generator = specHelper.factory.generator();
     subject = new File(path, generator);
   });
-
-  function lastLog(){
-    var logs = specHelper.mockLogger.messages();
-    return logs[logs.length - 1];
-  }
 
   function stubPrompt(result){
     sinon.stub(commander, 'confirm', function(ask, callback){

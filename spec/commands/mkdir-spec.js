@@ -10,17 +10,10 @@ describe("command/mkdir", function(){
       subject,
       generator;
 
-  specHelper.mockLogger.setup(this);
-
   beforeEach(function(){
     generator = specHelper.factory.generator();
     subject = new Mkdir(path, generator);
   });
-
-  function lastLog(){
-    var logs = specHelper.mockLogger.messages();
-    return logs[logs.length - 1];
-  }
 
   describe("initialize", function(){
 
@@ -76,7 +69,7 @@ describe("command/mkdir", function(){
       });
 
       it("should log that path already exists", function(){
-        expect(lastLog()).to.contain(
+        expect(specHelper.mockLogger.last()).to.contain(
           'already exists'
         );
       });
@@ -112,9 +105,9 @@ describe("command/mkdir", function(){
     it("should have created path", function(){
       expect(subject.pathExists()).to.be(true);
     });
-
+	
     it("should have logged creation", function(){
-      expect(lastLog()).to.contain('created');
+      expect(specHelper.mockLogger.last()).to.contain('created');
     });
 
   });

@@ -10,8 +10,6 @@ describe("commands/template", function(){
       subject,
       generator;
 
-  specHelper.mockLogger.setup(this);
-
   beforeEach(function(){
     generator = specHelper.factory.generator();
     subject = new Template(path, generator);
