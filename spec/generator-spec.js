@@ -160,49 +160,58 @@ describe("generator", function(){
 
   });
 
-  describe(".log", function(){
-
-    var msg;
-
-    beforeEach(function(){
-      msg = '';
-
-      subject.logger = function(log){
-        msg = log;
-      };
-    });
+  describe(".logFormat", function(){
+    var expected, result;
 
     //path, message
     describe("with two arguments", function(){
       it("should log out to console in expected format", function(){
-        var expected = '~> [ foo/path.js ] - oops';
+        expected = '~> [ foo/path.js ] - oops';
+        result = subject.logFormat('foo/path.js', 'oops');
 
-        subject.log('foo/path.js', 'oops');
-
-        expect(msg).to.be(expected);
+        expect(result).to.be(expected);
       });
     });
 
     //path, command, message
     describe("with three arguments", function(){
       it("should log out to console in expected format", function(){
-        var expected = '~> (mkdir) [ foo/path.js ] - oops';
+        expected = '~> (mkdir) [ foo/path.js ] - oops';
+        result = subject.logFormat('foo/path.js', 'mkdir', 'oops');
 
-        subject.log('foo/path.js', 'mkdir', 'oops');
-
-        expect(msg).to.be(expected);
+        expect(result).to.be(expected);
       });
     });
 
 
     describe("with one argument", function(){
       it("should log out to console in expected format", function(){
-        var expected = 'Make it happen';
+        expected = 'Make it happen';
+        result = subject.logFormat('Make it happen');
 
-        subject.log('Make it happen');
-
-        expect(msg).to.be(expected);
+        expect(result).to.be(expected);
       });
+    });
+
+  });
+
+  describe(".log", function(){
+
+    beforeEach(function(){
+      sinon.spy(subject, 'logFormat');
+      sinon.spy(subject, 'logger');
+
+      subject.log('1', '2', '3', '4');
+    });
+
+    it("should get log string by calling log format", function(){
+      expect(subject.logFormat).was.calledWith('1', '2', '3', '4');
+    });
+
+    it("should pass output of logFormat to .logger", function(){
+      expect(subject.logger).was.calledWith(subject.logFormat(
+        '1', '2', '3', '4'
+      ));
     });
 
   });
