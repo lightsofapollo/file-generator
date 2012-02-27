@@ -165,16 +165,16 @@ describe("command/file-abstract", function(){
       });
 
       it("should ask user if they want to delete path", function(){
-        expect(stubPrompt.asking).to.contain('Overwrite');
-        expect(stubPrompt.asking).to.contain(subject.path);
+        var msg = generator.logFormat(
+          subject.path,
+          'override?: '
+        );
+
+        expect(stubPrompt.asking).to.be(msg);
       });
 
       it("should have called _moveTarget", function(){
         expect(subject._moveTarget).was.called();
-      });
-
-      it("should destroy stdin", function(){
-        expect(process.stdin.destroy).was.called();
       });
 
     });
@@ -188,10 +188,6 @@ describe("command/file-abstract", function(){
 
       it("should not have called _moveTarget", function(){
         expect(subject._moveTarget).was.notCalled();
-      });
-
-      it("should destroy stdin", function(){
-        expect(process.stdin.destroy).was.called();
       });
 
     });
@@ -279,6 +275,16 @@ describe("command/file-abstract", function(){
 
       runCheck();
 
+      it("should log message notifying files are the same", function(){
+        var msg = generator.logFormat(
+          subject.path,
+          'skip',
+          'files are the same'
+        );
+
+        expect(specHelper.mockLogger.last()).to.be(msg);
+      });
+
       it("should call _checkTargetSame", function(){
         expect(subject._checkTargetSame).was.called();
       });
@@ -340,6 +346,17 @@ describe("command/file-abstract", function(){
       it("should save file to out/index", function(){
         expect(subject.pathExists()).to.be(true);
       });
+
+      it("should log success when complete", function(){
+        var msg = generator.logFormat(
+          subject.path,
+          'success',
+          'done'
+        );
+
+        expect(specHelper.mockLogger.last()).to.be(msg);
+      });
+
 
       it("should have the same contents as the result of .output", function(done){
         var actual = fs.readFileSync(subject.targetPath(), 'utf8');

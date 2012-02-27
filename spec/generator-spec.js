@@ -221,8 +221,13 @@ describe("generator", function(){
     beforeEach(function(done){
       sinon.spy(subject.queue.files, 'run');
       sinon.spy(subject.queue.directories, 'run');
+      sinon.stub(process.stdin, 'destroy');
 
       subject.run(done);
+    });
+
+    it("should destroy stdin on complete", function(){
+      expect(process.stdin.destroy).was.called();
     });
 
     it("should run directories queue", function(){
