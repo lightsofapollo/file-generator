@@ -67,7 +67,6 @@ describe("question", function(){
   describe(".run", function(){
 
     beforeEach(function(){
-      sinon.spy(Question.prototype, 'confirmPrompt');
       sinon.spy(Question.prototype, 'simplePrompt');
     });
 
@@ -84,15 +83,6 @@ describe("question", function(){
         expect(subject.choosePrompt).was.called();
       });
 
-    });
-
-    describe("when given Boolean as .type", function(){
-      setup({type: Boolean});
-      execute();
-
-      it("should call confirmPrompt", function(){
-        expect(subject.confirmPrompt).was.called();
-      });
     });
 
     describe("when given no type", function(){
@@ -164,19 +154,6 @@ describe("question", function(){
       hasSetupPrompt();
     });
 
-    describe(".confirmPrompt", function(){
-      setup({ defaultValue: true, type: Boolean }, function(){
-        value = true;
-      });
-
-      execute('yes');
-
-      it("should have called prompt on commander", function(){
-        expect(commander.confirm).was.calledWith(subject.prompt);
-      });
-
-      hasSetupPrompt();
-    });
 
     describe(".choosePrompt", function(){
       beforeEach(function(){
