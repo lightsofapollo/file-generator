@@ -31,7 +31,7 @@ suite = new Projstrap.Suite({
 //Assumes this file is in the root of your project
 watchr = new Projstrap.Watchr(__dirname, {
   //Poll very frequently
-  rate: 5
+  rate: 1
 });
 
 
