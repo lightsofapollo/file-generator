@@ -2,6 +2,7 @@ var Generator = require('../lib/generator'),
     Mkdir = require('../lib/commands/mkdir'),
     File = require('../lib/commands/file'),
     Template = require('../lib/commands/template'),
+    Question = require('../lib/commands/question'),
     Inheritance = require('../lib/inheritance'),
     CommandQueue = require('../lib/command-queue'),
     Variables = require('../lib/variables');
@@ -35,6 +36,9 @@ describe("generator", function(){
       expect(subject.queue.directories).to.be.a(CommandQueue);
     });
 
+    it("should create .queue.questions which is a commandQueue instance", function(){
+      expect(subject.queue.questions).to.be.a(CommandQueue);
+    });
     it("should create .inheritance object", function(){
       expect(subject.inheritance).to.be.a(Inheritance);
     });
@@ -105,29 +109,31 @@ describe("generator", function(){
     /**
      * Generates basics for a command spec.
      *
-     * @param {String} path path passed to the command
+     * @param {String} name name passed to the command
      * @param {String} command command name like 'file'
      * @param {Object} classObject the class of the command
      * @param {String} queueName name of the queue command is in
      */
-    function shouldBeACommand(path, command, classObject, queueName){
+    function shouldBeACommand(name, command, classObject, queueName){
 
       beforeEach(function(){
-        result = subject[command](path);
+        var commandArgs = [name],
+            args = Array.prototype.slice(arguments);
+
+        if(args.length > 4){
+          commandArgs.concat(args.slice(4, args.length));
+        }
+
+        result = subject[command].apply(subject, commandArgs);
         queue = subject.queue[queueName].commands;
       });
 
       it("should add a " + command + " command instance", function(){
-        //path normalization
-        expect(queue[path]).to.be.a(classObject);
-      });
-
-      it("should have set .path in command to " + path, function(){
-        expect(queue[path].path).to.be(path);
+        expect(queue[name]).to.be.a(classObject);
       });
 
       it("should set .gen on command", function(){
-        expect(queue[path].gen).to.be(subject);
+        expect(queue[name].gen).to.be(subject);
       });
 
       it("should be chainable", function(){
@@ -135,8 +141,17 @@ describe("generator", function(){
       });
     }
 
+    function shouldBeACommandWithPath(path, command, classObject, queueName){
+
+      shouldBeACommand.apply(this, arguments);
+
+      it("should have set .path in command to " + path, function(){
+        expect(queue[path].path).to.be(path);
+      });
+    }
+
     describe(".mkdir", function(){
-      shouldBeACommand('foo/', 'mkdir', Mkdir, 'directories');
+      shouldBeACommandWithPath('foo/', 'mkdir', Mkdir, 'directories');
 
       describe("with path normalization", function(){
         beforeEach(function(){
@@ -151,11 +166,20 @@ describe("generator", function(){
     });
 
     describe(".file", function(){
-      shouldBeACommand('index.js', 'file', File, 'files');
+      shouldBeACommandWithPath('index.js', 'file', File, 'files');
     });
 
     describe(".template", function(){
-      shouldBeACommand('index.js', 'template', Template, 'files');
+      shouldBeACommandWithPath('index.js', 'template', Template, 'files');
+    });
+
+    describe(".question", function(){
+
+      var options = {
+        prompt: 'foo'
+      };
+
+      shouldBeACommand('myVariable', 'question', Question, 'questions', options);
     });
 
   });
@@ -221,6 +245,7 @@ describe("generator", function(){
     beforeEach(function(done){
       sinon.spy(subject.queue.files, 'run');
       sinon.spy(subject.queue.directories, 'run');
+      sinon.spy(subject.queue.questions, 'run');
       sinon.stub(process.stdin, 'destroy');
 
       subject.run(done);
@@ -228,6 +253,10 @@ describe("generator", function(){
 
     it("should destroy stdin on complete", function(){
       expect(process.stdin.destroy).was.called();
+    });
+
+    it("should run questions queue", function(){
+      expect(subject.queue.questions.run).was.called();
     });
 
     it("should run directories queue", function(){
