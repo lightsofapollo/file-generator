@@ -5,7 +5,8 @@ var Generator = require('../lib/generator'),
     Question = require('../lib/commands/question'),
     Inheritance = require('../lib/inheritance'),
     CommandQueue = require('../lib/command-queue'),
-    Variables = require('../lib/variables');
+    Variables = require('../lib/variables'),
+    util = require('../lib/util');
 
 describe("generator", function(){
 
@@ -189,34 +190,30 @@ describe("generator", function(){
 
     //path, message
     describe("with two arguments", function(){
-      it("should log out to console in expected format", function(){
-        expected = '~> [ foo/path.js ] - oops';
-        result = subject.logFormat('foo/path.js', 'oops');
-
-        expect(result).to.be(expected);
+      it("should use .path log format", function(){
+        expect(subject.logFormat('1', '2')).to.be(
+          util.format(subject.LOG_FORMATS.path, '1', '2')
+        );
       });
     });
 
     //path, command, message
     describe("with three arguments", function(){
-      it("should log out to console in expected format", function(){
-        expected = '~> (mkdir) [ foo/path.js ] - oops';
-        result = subject.logFormat('foo/path.js', 'mkdir', 'oops');
-
-        expect(result).to.be(expected);
+      it("should use .commandPath log format", function(){
+        expect(subject.logFormat('1', '2', '3')).to.be(
+          util.format(subject.LOG_FORMATS.commandPath, '1', '2', '3')
+        );
       });
     });
 
 
     describe("with one argument", function(){
-      it("should log out to console in expected format", function(){
-        expected = 'Make it happen';
-        result = subject.logFormat('Make it happen');
-
-        expect(result).to.be(expected);
+      it("should use .message log format", function(){
+        expect(subject.logFormat('1')).to.be(
+          util.format(subject.LOG_FORMATS.message, '1')
+        );
       });
     });
-
   });
 
   describe(".log", function(){
