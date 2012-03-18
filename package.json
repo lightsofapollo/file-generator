@@ -1,6 +1,6 @@
 {
   "name": "file-generator",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "James Lal <james@lightsofapollo.com>",
   "description": "File/Directory Generator inspired by rails generators",
   "main": "./lib/generator",
