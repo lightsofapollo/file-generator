@@ -27,6 +27,12 @@ describe("command/mkdir", function(){
 
   });
 
+  describe(".commandType", function(){
+    it("should be directory", function(){
+      expect(subject.commandType).to.be('directory');
+    });
+  });
+
   describe(".pathExists", function(){
 
     beforeEach(function(){

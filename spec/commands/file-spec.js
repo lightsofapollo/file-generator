@@ -4,7 +4,7 @@ var Generator = require('../../lib/generator'),
     fsPath = require('path'),
     commander = require('commander');
 
-describe("command/file-abstract", function(){
+describe("command/file", function(){
 
   var path = 'index.js',
       dest = specHelper.factory.targetPath(),
@@ -35,6 +35,12 @@ describe("command/file-abstract", function(){
       expect(subject.gen).to.be(generator);
     });
 
+  });
+
+  describe(".commandType", function(){
+    it("should be file", function(){
+      expect(subject.commandType).to.be('file');
+    });
   });
 
 
@@ -167,6 +173,7 @@ describe("command/file-abstract", function(){
       it("should ask user if they want to delete path", function(){
         var msg = generator.logFormat(
           subject.path,
+          subject.commandType,
           'override?: '
         );
 
@@ -278,8 +285,8 @@ describe("command/file-abstract", function(){
       it("should log message notifying files are the same", function(){
         var msg = generator.logFormat(
           subject.path,
-          'skip',
-          'files are the same'
+          subject.commandType,
+          'files are the same skipping'
         );
 
         expect(specHelper.mockLogger.last()).to.be(msg);
@@ -350,8 +357,8 @@ describe("command/file-abstract", function(){
       it("should log success when complete", function(){
         var msg = generator.logFormat(
           subject.path,
-          'success',
-          'done'
+          subject.commandType,
+          'complete'
         );
 
         expect(specHelper.mockLogger.last()).to.be(msg);

@@ -31,14 +31,17 @@ describe("command/question", function(){
     });
 
     it("should pass .question.prompt through log formatter", function(){
-
-      var keyName = subject.logPrefix + subject.variable;
-
       expect(subject.question.prompt).to.equal(
-        generator.logFormat(keyName, 'foo? ')
+        generator.logFormat(subject.variable, subject.commandType, 'foo? ')
       );
     });
 
+  });
+
+  describe(".commandType", function(){
+    it("should be variable", function(){
+      expect(subject.commandType).to.be('variable');
+    });
   });
 
   describe(".check", function(){
