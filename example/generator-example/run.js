@@ -7,10 +7,19 @@ var Generator = require('file-generator'),
     }),
     variables = generator.variables;
 
-generator.template('package.json');
+generator.template('package.json').
+          mkdir('foo').
+          mkdir('bar').
+          mkdir('baz').
+          template('foo/index.js');
 
 generator.question('package.name', {
   prompt: "What is the name of your package? "
+});
+
+generator.question('main.function', {
+  prompt: "What is the name of the primary function? ",
+  defaultValue: "ReallyBadNameYouForgotToUpdate"
 });
 
 generator.question('package.version', {

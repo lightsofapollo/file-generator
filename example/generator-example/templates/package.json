@@ -1,4 +1,5 @@
 {
   "name": "<%= get('package.name') %>",
-  "version": "<%= get('package.version') %>"
+  "version": "<%= get('package.version') %>",
+  "main": "foo/index.js"
 }
