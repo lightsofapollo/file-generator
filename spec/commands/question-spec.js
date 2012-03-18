@@ -28,7 +28,15 @@ describe("command/question", function(){
 
     it("should set .question", function(){
       expect(subject.question).to.be.a(Question);
-      expect(subject.question.prompt).to.be('foo? ');
+    });
+
+    it("should pass .question.prompt through log formatter", function(){
+
+      var keyName = subject.logPrefix + subject.variable;
+
+      expect(subject.question.prompt).to.equal(
+        generator.logFormat(keyName, 'foo? ')
+      );
     });
 
   });

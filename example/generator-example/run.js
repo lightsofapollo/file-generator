@@ -9,9 +9,15 @@ var Generator = require('file-generator'),
 
 generator.template('package.json');
 
-variables.
-  set('package.name', 'myPackage').
-  set('package.version', '1.0');
+generator.question('package.name', {
+  prompt: "What is the name of your package? "
+});
+
+generator.question('package.version', {
+  prompt: "What is the version for your package? ",
+  defaultValue: '0.0.1'
+});
+
 
 generator.run(function(){
   console.log('Complete');
