@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/lightsofapollo/file-generator.png)](http://travis-ci.org/lightsofapollo/file-generator)
 # File Generator
 
 The aim of this project is to provide easy template based generation of project structures.
